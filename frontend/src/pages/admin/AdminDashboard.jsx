@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { api } from '@/lib/api'
@@ -6,7 +6,9 @@ import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 import {
   Card,
   CardContent,
@@ -54,6 +56,11 @@ async function fetchUsers() {
 async function fetchActivityLogs() {
   const { data } = await api.get('/admin/activity-logs', { params: { size: 100 } })
   return data.content
+}
+
+async function fetchAnnouncement() {
+  const { data } = await api.get('/announcements/current')
+  return data
 }
 
 function formatDate(value) {
@@ -145,9 +152,85 @@ export function AdminDashboard() {
     createMutation.mutate(form)
   }
 
+  const { data: announcement } = useQuery({
+    queryKey: ['announcement-current'],
+    queryFn: fetchAnnouncement,
+  })
+
+  const [announcementForm, setAnnouncementForm] = useState({ title: '', message: '' })
+  const [announcementError, setAnnouncementError] = useState('')
+
+  useEffect(() => {
+    if (announcement) {
+      setAnnouncementForm({ title: announcement.title, message: announcement.message })
+    }
+  }, [announcement])
+
+  const announcementMutation = useMutation({
+    mutationFn: (payload) => api.put('/announcements/current', payload),
+    onSuccess: () => {
+      setAnnouncementError('')
+      queryClient.invalidateQueries({ queryKey: ['announcement-current'] })
+    },
+    onError: (err) => {
+      setAnnouncementError(err.response?.data?.message ?? 'Duyuru kaydedilemedi.')
+    },
+  })
+
+  function handleAnnouncementSubmit(e) {
+    e.preventDefault()
+    setAnnouncementError('')
+    if (!announcementForm.title.trim() || !announcementForm.message.trim()) {
+      setAnnouncementError('Başlık ve mesaj gerekli.')
+      return
+    }
+    announcementMutation.mutate(announcementForm)
+  }
+
   return (
     <DashboardLayout title="Admin Paneli">
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
+        <Card className="text-left">
+          <CardHeader>
+            <CardTitle>Duyuru</CardTitle>
+            <CardDescription>
+              Öğrenci, öğretmen ve rehber panellerinin üstünde gösterilir.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {announcement && <AnnouncementBanner />}
+            <form onSubmit={handleAnnouncementSubmit} className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="announcementTitle">Başlık</Label>
+                <Input
+                  id="announcementTitle"
+                  value={announcementForm.title}
+                  onChange={(e) =>
+                    setAnnouncementForm({ ...announcementForm, title: e.target.value })
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="announcementMessage">Mesaj</Label>
+                <Textarea
+                  id="announcementMessage"
+                  rows={3}
+                  value={announcementForm.message}
+                  onChange={(e) =>
+                    setAnnouncementForm({ ...announcementForm, message: e.target.value })
+                  }
+                />
+              </div>
+              {announcementError && (
+                <p className="text-sm text-destructive">{announcementError}</p>
+              )}
+              <Button type="submit" size="sm" className="self-start" disabled={announcementMutation.isPending}>
+                Duyuruyu yayınla
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+
         <Card className="text-left">
           <CardHeader>
             <div className="flex items-center justify-between">

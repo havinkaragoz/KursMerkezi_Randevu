@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
 import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 async function fetchSessions() {
   const { data } = await api.get('/queue/sessions')
@@ -42,6 +43,8 @@ export function StudentDashboard() {
   return (
     <DashboardLayout title="Öğrenci Paneli">
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
+        <AnnouncementBanner />
+
         <h2 className="text-left text-base font-medium">Açık soru çözüm oturumları</h2>
 
         {isLoading && <p className="text-muted-foreground">Yükleniyor...</p>}

@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 async function fetchSessions() {
   const { data } = await api.get('/queue/sessions')
@@ -79,6 +80,8 @@ export function TeacherDashboard() {
   return (
     <DashboardLayout title="Öğretmen Paneli">
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
+        <AnnouncementBanner />
+
         <Card className="text-left">
           <CardHeader>
             <CardTitle>Yeni oturum aç</CardTitle>

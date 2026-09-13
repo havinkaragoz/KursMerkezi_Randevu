@@ -21,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { AnnouncementBanner } from '@/components/AnnouncementBanner'
 
 function formatDateTime(value) {
   if (!value) return '-'
@@ -89,6 +90,8 @@ export function GuidanceDashboard() {
   return (
     <DashboardLayout title="Rehber Öğretmen Paneli">
       <div className="mx-auto flex max-w-2xl flex-col gap-6">
+        <AnnouncementBanner />
+
         <Card className="text-left">
           <CardHeader>
             <CardTitle>Müsaitlik saati ekle</CardTitle>
