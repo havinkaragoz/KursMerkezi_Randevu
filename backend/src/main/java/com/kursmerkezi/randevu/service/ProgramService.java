@@ -1,0 +1,111 @@
+package com.kursmerkezi.randevu.service;
+
+import com.kursmerkezi.randevu.dto.WeeklyProgramResponse;
+import com.kursmerkezi.randevu.exception.ApiException;
+import com.kursmerkezi.randevu.model.User;
+import com.kursmerkezi.randevu.model.WeeklyProgram;
+import com.kursmerkezi.randevu.repository.WeeklyProgramRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class ProgramService {
+
+    private final WeeklyProgramRepository programRepository;
+    private final ActivityLogService activityLogService;
+
+    @Value("${app.upload.dir}")
+    private String uploadDir;
+
+    private static final long MAX_FILE_SIZE = 10L * 1024 * 1024;
+
+    @Transactional
+    public WeeklyProgramResponse upload(User admin, MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new ApiException("Dosya boş olamaz", HttpStatus.BAD_REQUEST);
+        }
+        if (file.getSize() > MAX_FILE_SIZE) {
+            throw new ApiException("Dosya boyutu 10MB'dan büyük olamaz", HttpStatus.BAD_REQUEST);
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || !(contentType.startsWith("image/") || contentType.equals("application/pdf"))) {
+            throw new ApiException("Sadece resim veya PDF dosyası yükleyebilirsiniz", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Path dir = Path.of(uploadDir);
+            Files.createDirectories(dir);
+
+            String extension = "";
+            String original = file.getOriginalFilename();
+            if (original != null && original.contains(".")) {
+                extension = original.substring(original.lastIndexOf('.'));
+            }
+            String storedFileName = UUID.randomUUID() + extension;
+
+            Path target = dir.resolve(storedFileName);
+            file.transferTo(target);
+
+            WeeklyProgram program = WeeklyProgram.builder()
+                    .storedFileName(storedFileName)
+                    .originalFileName(original != null ? original : storedFileName)
+                    .contentType(contentType)
+                    .uploadedBy(admin)
+                    .uploadedAt(LocalDateTime.now())
+                    .build();
+
+            program = programRepository.save(program);
+
+            activityLogService.log(admin, "PROGRAM_UPLOAD",
+                    admin.getFullName() + ", haftalık programı güncelledi (" + program.getOriginalFileName() + ")");
+
+            return toResponse(program);
+        } catch (IOException e) {
+            throw new ApiException("Dosya kaydedilirken hata oluştu", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public WeeklyProgramResponse getCurrentMeta() {
+        return programRepository.findTopByOrderByUploadedAtDesc()
+                .map(this::toResponse)
+                .orElseThrow(() -> new ApiException("Henüz bir program yüklenmemiş", HttpStatus.NOT_FOUND));
+    }
+
+    public Resource getCurrentFile() {
+        WeeklyProgram program = programRepository.findTopByOrderByUploadedAtDesc()
+                .orElseThrow(() -> new ApiException("Henüz bir program yüklenmemiş", HttpStatus.NOT_FOUND));
+
+        Path path = Path.of(uploadDir).resolve(program.getStoredFileName());
+        if (!Files.exists(path)) {
+            throw new ApiException("Dosya bulunamadı", HttpStatus.NOT_FOUND);
+        }
+        return new FileSystemResource(path);
+    }
+
+    public String getCurrentContentType() {
+        return programRepository.findTopByOrderByUploadedAtDesc()
+                .map(WeeklyProgram::getContentType)
+                .orElse("application/octet-stream");
+    }
+
+    private WeeklyProgramResponse toResponse(WeeklyProgram program) {
+        return new WeeklyProgramResponse(
+                program.getId(), program.getOriginalFileName(), program.getContentType(),
+                program.getUploadedBy().getFullName(), program.getUploadedAt()
+        );
+    }
+}

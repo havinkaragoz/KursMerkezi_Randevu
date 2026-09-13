@@ -1,0 +1,19 @@
+# Backend (Maven / Spring Boot)
+backend/target/
+backend/uploads/
+backend/HELP.md
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Frontend (Node / React)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
