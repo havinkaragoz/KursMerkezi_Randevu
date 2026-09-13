@@ -51,6 +51,11 @@ async function fetchUsers() {
   return data
 }
 
+async function fetchActivityLogs() {
+  const { data } = await api.get('/admin/activity-logs', { params: { size: 100 } })
+  return data.content
+}
+
 function formatDate(value) {
   if (!value) return '-'
   return new Date(value).toLocaleString('tr-TR', {
@@ -73,6 +78,12 @@ export function AdminDashboard() {
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
     queryFn: fetchUsers,
+  })
+
+  const { data: activityLogs, isLoading: logsLoading } = useQuery({
+    queryKey: ['admin-activity-logs'],
+    queryFn: fetchActivityLogs,
+    refetchInterval: 10000,
   })
 
   const createMutation = useMutation({
@@ -269,6 +280,47 @@ export function AdminDashboard() {
             </form>
             {programError && <p className="text-sm text-destructive">{programError}</p>}
             <WeeklyProgramViewer refreshKey={programVersion} />
+          </CardContent>
+        </Card>
+
+        <Card className="text-left">
+          <CardHeader>
+            <CardTitle>Aktivite geçmişi</CardTitle>
+            <CardDescription>Sistemdeki önemli işlemlerin kaydı</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {logsLoading && <p className="text-muted-foreground">Yükleniyor...</p>}
+            {!logsLoading && (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Tarih</TableHead>
+                    <TableHead>Kullanıcı</TableHead>
+                    <TableHead>Rol</TableHead>
+                    <TableHead>Açıklama</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {activityLogs?.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={4} className="text-muted-foreground">
+                        Henüz bir kayıt yok.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  {activityLogs?.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="whitespace-nowrap">{formatDate(log.createdAt)}</TableCell>
+                      <TableCell>{log.actorFullName}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{ROLE_LABELS[log.actorRole] ?? log.actorRole}</Badge>
+                      </TableCell>
+                      <TableCell>{log.description}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>
