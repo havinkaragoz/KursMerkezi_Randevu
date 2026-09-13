@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { api } from '@/lib/api'
+import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -91,6 +92,37 @@ export function AdminDashboard() {
     mutationFn: (id) => api.delete(`/admin/users/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
   })
+
+  const fileInputRef = useRef(null)
+  const [programVersion, setProgramVersion] = useState(0)
+  const [programError, setProgramError] = useState('')
+
+  const uploadProgramMutation = useMutation({
+    mutationFn: (file) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      return api.post('/programs/upload', formData)
+    },
+    onSuccess: () => {
+      setProgramError('')
+      setProgramVersion((v) => v + 1)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    },
+    onError: (err) => {
+      setProgramError(err.response?.data?.message ?? 'Dosya yüklenemedi.')
+    },
+  })
+
+  function handleProgramUpload(e) {
+    e.preventDefault()
+    setProgramError('')
+    const file = fileInputRef.current?.files?.[0]
+    if (!file) {
+      setProgramError('Bir dosya seç.')
+      return
+    }
+    uploadProgramMutation.mutate(file)
+  }
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -213,6 +245,30 @@ export function AdminDashboard() {
                 </TableBody>
               </Table>
             )}
+          </CardContent>
+        </Card>
+
+        <Card className="text-left">
+          <CardHeader>
+            <CardTitle>Haftalık program</CardTitle>
+            <CardDescription>
+              Yeni bir resim veya PDF yükleyince öğrenciler en son yüklenen programı görür.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <form onSubmit={handleProgramUpload} className="flex flex-wrap items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*,application/pdf"
+                className="text-sm text-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-2.5 file:py-1.5 file:text-sm file:font-medium"
+              />
+              <Button type="submit" size="sm" disabled={uploadProgramMutation.isPending}>
+                Yükle
+              </Button>
+            </form>
+            {programError && <p className="text-sm text-destructive">{programError}</p>}
+            <WeeklyProgramViewer refreshKey={programVersion} />
           </CardContent>
         </Card>
       </div>

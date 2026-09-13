@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
+import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
 
 async function fetchSessions() {
   const { data } = await api.get('/queue/sessions')
@@ -96,6 +97,15 @@ export function StudentDashboard() {
         })}
 
         <GuidanceBooking />
+
+        <div className="flex flex-col gap-4">
+          <h2 className="text-left text-base font-medium">Haftalık program</h2>
+          <Card className="text-left">
+            <CardContent>
+              <WeeklyProgramViewer />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </DashboardLayout>
   )
