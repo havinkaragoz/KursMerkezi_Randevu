@@ -3,6 +3,7 @@ package com.kursmerkezi.randevu.service;
 import com.kursmerkezi.randevu.dto.AppointmentResponse;
 import com.kursmerkezi.randevu.dto.GuidanceSlotRequest;
 import com.kursmerkezi.randevu.dto.GuidanceSlotResponse;
+import com.kursmerkezi.randevu.dto.UserResponse;
 import com.kursmerkezi.randevu.exception.ApiException;
 import com.kursmerkezi.randevu.model.*;
 import com.kursmerkezi.randevu.repository.AppointmentRepository;
@@ -46,6 +47,10 @@ public class GuidanceService {
                 guidanceTeacher.getFullName() + ", " + slot.getStartTime() + " için rehberlik randevu saati oluşturdu");
 
         return toResponse(slot);
+    }
+
+    public List<UserResponse> listGuidanceTeachers() {
+        return userRepository.findByRole(Role.GUIDANCE).stream().map(UserResponse::from).toList();
     }
 
     public List<GuidanceSlotResponse> listAvailableSlots(Long guidanceTeacherId) {

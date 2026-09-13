@@ -3,6 +3,7 @@ package com.kursmerkezi.randevu.controller;
 import com.kursmerkezi.randevu.dto.AppointmentResponse;
 import com.kursmerkezi.randevu.dto.GuidanceSlotRequest;
 import com.kursmerkezi.randevu.dto.GuidanceSlotResponse;
+import com.kursmerkezi.randevu.dto.UserResponse;
 import com.kursmerkezi.randevu.security.UserPrincipal;
 import com.kursmerkezi.randevu.service.GuidanceService;
 import jakarta.validation.Valid;
@@ -19,6 +20,11 @@ import java.util.List;
 public class GuidanceController {
 
     private final GuidanceService guidanceService;
+
+    @GetMapping("/teachers")
+    public List<UserResponse> listGuidanceTeachers() {
+        return guidanceService.listGuidanceTeachers();
+    }
 
     @PostMapping("/slots")
     @PreAuthorize("hasRole('GUIDANCE')")

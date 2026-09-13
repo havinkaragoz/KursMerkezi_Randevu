@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
 
 async function fetchSessions() {
   const { data } = await api.get('/queue/sessions')
@@ -93,6 +94,8 @@ export function StudentDashboard() {
             </Card>
           )
         })}
+
+        <GuidanceBooking />
       </div>
     </DashboardLayout>
   )
