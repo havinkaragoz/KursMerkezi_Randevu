@@ -1,16 +1,15 @@
 package com.kursmerkezi.randevu.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
-public class GuidanceSlotRequest {
+public class BookAppointmentRequest {
 
     @NotNull
-    private LocalDateTime startTime;
+    private Long availabilityId;
 
     @NotNull
-    private LocalDateTime endTime;
+    private LocalDate date;
 }

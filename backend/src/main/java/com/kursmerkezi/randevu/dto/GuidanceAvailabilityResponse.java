@@ -1,17 +1,17 @@
 package com.kursmerkezi.randevu.dto;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
-public class GuidanceSlotResponse {
+public class GuidanceAvailabilityResponse {
     private Long id;
     private Long guidanceTeacherId;
     private String guidanceTeacherFullName;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private boolean booked;
+    private DayOfWeek dayOfWeek;
+    private LocalTime startTime;
+    private LocalTime endTime;
 }

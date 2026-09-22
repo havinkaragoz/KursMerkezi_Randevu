@@ -9,15 +9,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
-function formatDateTime(value) {
-  if (!value) return '-'
-  return new Date(value).toLocaleString('tr-TR', {
+function formatDateTime(date, startTime) {
+  if (!date) return '-'
+  const dateLabel = new Date(`${date}T00:00:00`).toLocaleDateString('tr-TR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
   })
+  return `${dateLabel}, ${startTime?.slice(0, 5) ?? ''}`
 }
 
 async function fetchMyAppointments() {
@@ -55,7 +54,7 @@ export function StudentHome() {
             >
               <span className="text-sm font-medium">{a.guidanceTeacherFullName}</span>
               <span className="text-sm text-muted-foreground">
-                {formatDateTime(a.startTime)}
+                {formatDateTime(a.date, a.startTime)}
               </span>
             </div>
           ))}
