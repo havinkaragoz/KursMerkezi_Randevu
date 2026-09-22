@@ -11,6 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { HipokratLogo } from '@/components/HipokratLogo'
 
 const ROLE_HOME = {
   STUDENT: '/student',
@@ -42,10 +43,11 @@ export function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-svh items-center justify-center bg-muted p-4">
+    <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-4">
+      <HipokratLogo size="lg" />
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Kurs Merkezi Randevu</CardTitle>
+          <CardTitle>Randevu Sistemi</CardTitle>
           <CardDescription>Giriş yapmak için bilgilerinizi girin</CardDescription>
         </CardHeader>
         <CardContent>

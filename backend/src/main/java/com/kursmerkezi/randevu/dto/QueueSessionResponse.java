@@ -15,6 +15,7 @@ public class QueueSessionResponse {
     private Long teacherId;
     private String teacherFullName;
     private Integer maxCapacity;
+    private LocalDateTime sessionTime;
     private LocalDateTime createdAt;
     private List<QueueEntryResponse> waitingList;
 }

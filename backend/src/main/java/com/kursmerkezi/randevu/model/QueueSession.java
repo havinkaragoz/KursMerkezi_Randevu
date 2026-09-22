@@ -33,6 +33,8 @@ public class QueueSession {
 
     private Integer maxCapacity;
 
+    private LocalDateTime sessionTime;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 }

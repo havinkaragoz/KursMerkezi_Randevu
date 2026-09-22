@@ -38,6 +38,7 @@ public class QueueService {
                 .title(request.getTitle())
                 .status(QueueStatus.OPEN)
                 .maxCapacity(request.getMaxCapacity())
+                .sessionTime(request.getSessionTime())
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -162,7 +163,7 @@ public class QueueService {
         return new QueueSessionResponse(
                 session.getId(), session.getTitle(), session.getStatus().name(),
                 session.getTeacher().getId(), session.getTeacher().getFullName(),
-                session.getMaxCapacity(), session.getCreatedAt(), entries
+                session.getMaxCapacity(), session.getSessionTime(), session.getCreatedAt(), entries
         );
     }
 

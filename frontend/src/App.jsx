@@ -3,7 +3,11 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/context/AuthContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { LoginPage } from '@/pages/LoginPage'
-import { StudentDashboard } from '@/pages/student/StudentDashboard'
+import { StudentLayout } from '@/pages/student/StudentLayout'
+import { StudentHome } from '@/pages/student/StudentHome'
+import { StudentQueuePage } from '@/pages/student/StudentQueuePage'
+import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
+import { StudentProgramPage } from '@/pages/student/StudentProgramPage'
 import { TeacherDashboard } from '@/pages/teacher/TeacherDashboard'
 import { GuidanceDashboard } from '@/pages/guidance/GuidanceDashboard'
 import { AdminDashboard } from '@/pages/admin/AdminDashboard'
@@ -30,7 +34,12 @@ function AppRoutes() {
       <Route path="/" element={<HomeRedirect />} />
 
       <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
-        <Route path="/student" element={<StudentDashboard />} />
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<StudentHome />} />
+          <Route path="queue" element={<StudentQueuePage />} />
+          <Route path="guidance" element={<GuidanceBooking />} />
+          <Route path="program" element={<StudentProgramPage />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
