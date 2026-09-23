@@ -7,28 +7,44 @@ const SIZES = {
   lg: { text: 'text-4xl sm:text-5xl', icon: 30, iconBox: 'size-11 sm:size-13 border-[3px]', sub: 'text-xs' },
 }
 
-export function HipokratLogo({ size = 'md', className }) {
+const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight text-foreground'
+
+function Wordmark({ s }) {
+  return (
+    <div className={cn(WORDMARK_CLASS, s.text)}>
+      <span>HİP</span>
+      <span
+        className={cn(
+          'mx-0.5 inline-flex items-center justify-center rounded-full border-brand-gold text-brand-gold',
+          s.iconBox,
+        )}
+      >
+        <Landmark size={s.icon} strokeWidth={2.5} />
+      </span>
+      <span>KRAT</span>
+    </div>
+  )
+}
+
+/**
+ * variant "full" — icon + wordmark + underline + tagline, for surfaces with room to breathe
+ * (login screen). variant "compact" — icon + wordmark only, for persistent app chrome
+ * (sidebars, headers) where the tagline would just add noise.
+ */
+export function HipokratLogo({ size = 'md', variant = 'full', className }) {
   const s = SIZES[size] ?? SIZES.md
+
+  if (variant === 'compact') {
+    return (
+      <div className={cn('flex', className)}>
+        <Wordmark s={s} />
+      </div>
+    )
+  }
 
   return (
     <div className={cn('flex flex-col items-center', className)}>
-      <div
-        className={cn(
-          'flex items-center font-heading font-extrabold tracking-tight text-foreground',
-          s.text,
-        )}
-      >
-        <span>HİP</span>
-        <span
-          className={cn(
-            'mx-0.5 inline-flex items-center justify-center rounded-full border-brand-gold text-brand-gold',
-            s.iconBox,
-          )}
-        >
-          <Landmark size={s.icon} strokeWidth={2.5} />
-        </span>
-        <span>KRAT</span>
-      </div>
+      <Wordmark s={s} />
       <div className="mt-0.5 h-0.5 w-full bg-brand-gold" />
       <p className={cn('mt-1 font-semibold tracking-wide text-brand-gold', s.sub)}>
         EĞİTİM &amp; DANIŞMANLIK VE KÜTÜPHANE
