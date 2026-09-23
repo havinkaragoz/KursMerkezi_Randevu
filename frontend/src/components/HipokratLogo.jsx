@@ -7,11 +7,11 @@ const SIZES = {
   lg: { text: 'text-4xl sm:text-5xl', icon: 30, iconBox: 'size-11 sm:size-13 border-[3px]', sub: 'text-xs' },
 }
 
-const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight text-foreground'
+const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight'
 
-function Wordmark({ s }) {
+function Wordmark({ s, tone }) {
   return (
-    <div className={cn(WORDMARK_CLASS, s.text)}>
+    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-anthracite-foreground' : 'text-foreground')}>
       <span>HİP</span>
       <span
         className={cn(
@@ -29,7 +29,8 @@ function Wordmark({ s }) {
 /**
  * variant "full" — icon + wordmark + underline + tagline, for surfaces with room to breathe
  * (login screen). variant "compact" — icon + wordmark only, for persistent app chrome
- * (sidebars, headers) where the tagline would just add noise.
+ * (the anthracite sidebar) where the tagline would just add noise — wordmark text renders
+ * light since it always sits on the dark sidebar, regardless of the app's light/dark theme.
  */
 export function HipokratLogo({ size = 'md', variant = 'full', className }) {
   const s = SIZES[size] ?? SIZES.md
@@ -37,7 +38,7 @@ export function HipokratLogo({ size = 'md', variant = 'full', className }) {
   if (variant === 'compact') {
     return (
       <div className={cn('flex', className)}>
-        <Wordmark s={s} />
+        <Wordmark s={s} tone="light" />
       </div>
     )
   }

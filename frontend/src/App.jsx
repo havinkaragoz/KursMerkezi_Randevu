@@ -10,7 +10,11 @@ import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
 import { StudentProgramPage } from '@/pages/student/StudentProgramPage'
 import { TeacherDashboard } from '@/pages/teacher/TeacherDashboard'
 import { GuidanceDashboard } from '@/pages/guidance/GuidanceDashboard'
-import { AdminDashboard } from '@/pages/admin/AdminDashboard'
+import { AdminLayout } from '@/pages/admin/AdminLayout'
+import { AdminAnnouncementPage } from '@/pages/admin/AdminAnnouncementPage'
+import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
+import { AdminProgramPage } from '@/pages/admin/AdminProgramPage'
+import { AdminActivityLogPage } from '@/pages/admin/AdminActivityLogPage'
 
 const queryClient = new QueryClient()
 
@@ -51,7 +55,12 @@ function AppRoutes() {
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminAnnouncementPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="program" element={<AdminProgramPage />} />
+          <Route path="activity" element={<AdminActivityLogPage />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

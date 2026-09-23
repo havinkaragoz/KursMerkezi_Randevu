@@ -3,20 +3,14 @@ import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { HipokratLogo } from '@/components/HipokratLogo'
 import { cn } from '@/lib/utils'
-
-const ROLE_LABELS = {
-  STUDENT: 'Öğrenci',
-  TEACHER: 'Öğretmen',
-  GUIDANCE: 'Rehber Öğretmen',
-  ADMIN: 'Admin',
-}
+import { ROLE_LABELS } from '@/lib/roleLabels'
 
 export function DashboardLayout({ title, navItems, children }) {
   const { user, logout } = useAuth()
 
   return (
     <div className="flex min-h-svh bg-muted">
-      <aside className="flex w-60 shrink-0 flex-col justify-between border-r bg-background px-4 py-5">
+      <aside className="flex w-60 shrink-0 flex-col justify-between bg-brand-anthracite px-4 py-5">
         <div className="flex flex-col gap-6">
           <HipokratLogo variant="compact" size="sm" className="px-1" />
 
@@ -32,7 +26,7 @@ export function DashboardLayout({ title, navItems, children }) {
                       'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium transition-colors',
                       isActive
                         ? 'bg-brand-gold text-brand-gold-foreground shadow-sm'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        : 'text-brand-anthracite-foreground/65 hover:bg-white/10 hover:text-brand-anthracite-foreground',
                     )
                   }
                 >
@@ -44,14 +38,21 @@ export function DashboardLayout({ title, navItems, children }) {
           )}
         </div>
 
-        <div className="flex flex-col gap-3 border-t pt-4">
+        <div className="flex flex-col gap-3 border-t border-white/10 pt-4">
           <div className="px-1">
-            <p className="truncate text-sm font-medium">{user?.fullName}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="truncate text-sm font-medium text-brand-anthracite-foreground">
+              {user?.fullName}
+            </p>
+            <p className="text-xs text-brand-anthracite-foreground/60">
               {ROLE_LABELS[user?.role] ?? user?.role}
             </p>
           </div>
-          <Button variant="outline" size="sm" onClick={logout}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={logout}
+            className="border-white/15 bg-transparent text-brand-anthracite-foreground hover:bg-white/10 hover:text-brand-anthracite-foreground"
+          >
             Çıkış yap
           </Button>
         </div>

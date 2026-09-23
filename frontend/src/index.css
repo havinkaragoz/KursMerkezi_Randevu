@@ -8,6 +8,8 @@
 @theme inline {
     --color-brand-gold: var(--brand-gold);
     --color-brand-gold-foreground: var(--brand-gold-foreground);
+    --color-brand-anthracite: var(--brand-anthracite);
+    --color-brand-anthracite-foreground: var(--brand-anthracite-foreground);
     --font-heading: var(--font-sans);
     --font-sans: 'Geist Variable', sans-serif;
     --color-sidebar-ring: var(--sidebar-ring);
@@ -53,6 +55,8 @@
 :root {
     --brand-gold: #f2b705;
     --brand-gold-foreground: #3a3a1a;
+    --brand-anthracite: #2b2d31;
+    --brand-anthracite-foreground: #f2f1ec;
 
     --background: oklch(1 0 0);
     --foreground: oklch(0.145 0 0);

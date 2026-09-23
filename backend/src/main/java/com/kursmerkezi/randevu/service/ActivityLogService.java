@@ -1,6 +1,7 @@
 package com.kursmerkezi.randevu.service;
 
 import com.kursmerkezi.randevu.model.ActivityLog;
+import com.kursmerkezi.randevu.model.Role;
 import com.kursmerkezi.randevu.model.User;
 import com.kursmerkezi.randevu.repository.ActivityLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,10 @@ public class ActivityLogService {
         activityLogRepository.save(logEntry);
     }
 
-    public Page<ActivityLog> getLogs(Pageable pageable) {
+    public Page<ActivityLog> getLogs(Pageable pageable, Role actorRoleFilter) {
+        if (actorRoleFilter != null) {
+            return activityLogRepository.findByActorRoleOrderByCreatedAtDesc(actorRoleFilter, pageable);
+        }
         return activityLogRepository.findAllByOrderByCreatedAtDesc(pageable);
     }
 }

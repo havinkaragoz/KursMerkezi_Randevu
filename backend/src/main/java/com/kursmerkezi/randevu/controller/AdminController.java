@@ -3,6 +3,7 @@ package com.kursmerkezi.randevu.controller;
 import com.kursmerkezi.randevu.dto.CreateUserRequest;
 import com.kursmerkezi.randevu.dto.UserResponse;
 import com.kursmerkezi.randevu.model.ActivityLog;
+import com.kursmerkezi.randevu.model.Role;
 import com.kursmerkezi.randevu.security.UserPrincipal;
 import com.kursmerkezi.randevu.service.ActivityLogService;
 import com.kursmerkezi.randevu.service.AdminService;
@@ -41,7 +42,8 @@ public class AdminController {
 
     @GetMapping("/activity-logs")
     public Page<ActivityLog> getActivityLogs(@RequestParam(defaultValue = "0") int page,
-                                              @RequestParam(defaultValue = "50") int size) {
-        return activityLogService.getLogs(PageRequest.of(page, size));
+                                              @RequestParam(defaultValue = "50") int size,
+                                              @RequestParam(required = false) Role actorRole) {
+        return activityLogService.getLogs(PageRequest.of(page, size), actorRole);
     }
 }
