@@ -43,7 +43,8 @@ public class AdminController {
     @GetMapping("/activity-logs")
     public Page<ActivityLog> getActivityLogs(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "50") int size,
-                                              @RequestParam(required = false) Role actorRole) {
-        return activityLogService.getLogs(PageRequest.of(page, size), actorRole);
+                                              @RequestParam(required = false) Role actorRole,
+                                              @RequestParam(required = false) String search) {
+        return activityLogService.getLogs(PageRequest.of(page, size), actorRole, search);
     }
 }

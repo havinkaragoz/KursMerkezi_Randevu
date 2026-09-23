@@ -10,4 +10,10 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, Long> 
     Page<ActivityLog> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     Page<ActivityLog> findByActorRoleOrderByCreatedAtDesc(Role actorRole, Pageable pageable);
+
+    Page<ActivityLog> findByActorFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
+            String actorFullName, Pageable pageable);
+
+    Page<ActivityLog> findByActorRoleAndActorFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
+            Role actorRole, String actorFullName, Pageable pageable);
 }

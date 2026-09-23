@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Search } from 'lucide-react'
 import { api } from '@/lib/api'
 import { ROLE_LABELS } from '@/lib/roleLabels'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -39,19 +41,30 @@ function formatDate(value) {
   })
 }
 
-async function fetchActivityLogs(actorRole) {
+async function fetchActivityLogs(actorRole, search) {
   const { data } = await api.get('/admin/activity-logs', {
-    params: { size: 100, ...(actorRole ? { actorRole } : {}) },
+    params: {
+      size: 100,
+      ...(actorRole ? { actorRole } : {}),
+      ...(search ? { search } : {}),
+    },
   })
   return data.content
 }
 
 export function AdminActivityLogPage() {
   const [filter, setFilter] = useState(null)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
   const { data: activityLogs, isLoading } = useQuery({
-    queryKey: ['admin-activity-logs', filter],
-    queryFn: () => fetchActivityLogs(filter),
+    queryKey: ['admin-activity-logs', filter, debouncedSearch],
+    queryFn: () => fetchActivityLogs(filter, debouncedSearch),
     refetchInterval: 10000,
   })
 
@@ -59,9 +72,25 @@ export function AdminActivityLogPage() {
     <Card className="text-left shadow-sm">
       <CardHeader>
         <CardTitle>Aktivite geçmişi</CardTitle>
-        <CardDescription>Role göre filtreleyerek işlemleri daha kolay takip et.</CardDescription>
+        <CardDescription>
+          Bir kullanıcı ara veya role göre filtrele — örn. bir öğrenci/veli geldiğinde onunla
+          ilgili tüm işlemleri tek bakışta görmek için.
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
+        <div className="relative max-w-sm">
+          <Search
+            size={16}
+            className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            placeholder="Kullanıcı adıyla ara (örn. Mehmet Ogrenci)"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
         <div className="flex flex-wrap gap-2">
           {FILTERS.map((f) => (
             <Button

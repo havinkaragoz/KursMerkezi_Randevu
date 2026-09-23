@@ -29,7 +29,17 @@ public class ActivityLogService {
         activityLogRepository.save(logEntry);
     }
 
-    public Page<ActivityLog> getLogs(Pageable pageable, Role actorRoleFilter) {
+    public Page<ActivityLog> getLogs(Pageable pageable, Role actorRoleFilter, String search) {
+        boolean hasSearch = search != null && !search.isBlank();
+
+        if (actorRoleFilter != null && hasSearch) {
+            return activityLogRepository.findByActorRoleAndActorFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                    actorRoleFilter, search.trim(), pageable);
+        }
+        if (hasSearch) {
+            return activityLogRepository.findByActorFullNameContainingIgnoreCaseOrderByCreatedAtDesc(
+                    search.trim(), pageable);
+        }
         if (actorRoleFilter != null) {
             return activityLogRepository.findByActorRoleOrderByCreatedAtDesc(actorRoleFilter, pageable);
         }
