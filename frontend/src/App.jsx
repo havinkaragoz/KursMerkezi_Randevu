@@ -8,7 +8,9 @@ import { StudentHome } from '@/pages/student/StudentHome'
 import { StudentQueuePage } from '@/pages/student/StudentQueuePage'
 import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
 import { StudentProgramPage } from '@/pages/student/StudentProgramPage'
-import { TeacherDashboard } from '@/pages/teacher/TeacherDashboard'
+import { TeacherLayout } from '@/pages/teacher/TeacherLayout'
+import { TeacherSessionsPage } from '@/pages/teacher/TeacherSessionsPage'
+import { TeacherProgramPage } from '@/pages/teacher/TeacherProgramPage'
 import { GuidanceLayout } from '@/pages/guidance/GuidanceLayout'
 import { GuidanceAvailabilityPage } from '@/pages/guidance/GuidanceAvailabilityPage'
 import { GuidanceAppointmentsPage } from '@/pages/guidance/GuidanceAppointmentsPage'
@@ -51,7 +53,10 @@ function AppRoutes() {
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
-        <Route path="/teacher" element={<TeacherDashboard />} />
+        <Route path="/teacher" element={<TeacherLayout />}>
+          <Route index element={<TeacherSessionsPage />} />
+          <Route path="program" element={<TeacherProgramPage />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['GUIDANCE']} />}>
