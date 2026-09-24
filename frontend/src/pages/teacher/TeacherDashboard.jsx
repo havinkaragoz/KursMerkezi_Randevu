@@ -24,6 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { AnnouncementBanner } from '@/components/AnnouncementBanner'
+import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
 
 function formatDateTime(value) {
   if (!value) return null
@@ -215,6 +216,15 @@ export function TeacherDashboard() {
             )
           })}
         </div>
+
+        <Card className="text-left shadow-sm">
+          <CardHeader>
+            <CardTitle>Haftalık program</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WeeklyProgramViewer />
+          </CardContent>
+        </Card>
       </div>
     </DashboardLayout>
   )

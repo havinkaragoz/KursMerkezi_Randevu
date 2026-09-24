@@ -3,6 +3,7 @@ package com.kursmerkezi.randevu.controller;
 import com.kursmerkezi.randevu.dto.WeeklyProgramResponse;
 import com.kursmerkezi.randevu.security.UserPrincipal;
 import com.kursmerkezi.randevu.service.ProgramService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -26,17 +27,23 @@ public class ProgramController {
         return programService.upload(principal.getUser(), file);
     }
 
-    @GetMapping("/current")
-    public WeeklyProgramResponse getCurrentMeta() {
-        return programService.getCurrentMeta();
+    @GetMapping
+    public List<WeeklyProgramResponse> listPrograms() {
+        return programService.listPrograms();
     }
 
-    @GetMapping("/current/file")
-    public ResponseEntity<Resource> getCurrentFile() {
-        Resource resource = programService.getCurrentFile();
-        String contentType = programService.getCurrentContentType();
+    @GetMapping("/{id}/file")
+    public ResponseEntity<Resource> getFile(@PathVariable Long id) {
+        Resource resource = programService.getFile(id);
+        String contentType = programService.getContentType(id);
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(resource);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteProgram(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
+        programService.deleteProgram(id, principal.getUser());
     }
 }

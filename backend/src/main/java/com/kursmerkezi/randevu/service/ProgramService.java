@@ -18,11 +18,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class ProgramService {
+
+    private static final int MAX_PROGRAMS = 3;
 
     private final WeeklyProgramRepository programRepository;
     private final ActivityLogService activityLogService;
@@ -34,6 +37,11 @@ public class ProgramService {
 
     @Transactional
     public WeeklyProgramResponse upload(User admin, MultipartFile file) {
+        if (programRepository.count() >= MAX_PROGRAMS) {
+            throw new ApiException(
+                    "En fazla " + MAX_PROGRAMS + " program yükleyebilirsiniz. Yeni birini eklemek için önce birini silin.",
+                    HttpStatus.CONFLICT);
+        }
         if (file.isEmpty()) {
             throw new ApiException("Dosya boş olamaz", HttpStatus.BAD_REQUEST);
         }
@@ -71,7 +79,7 @@ public class ProgramService {
             program = programRepository.save(program);
 
             activityLogService.log(admin, "PROGRAM_UPLOAD",
-                    admin.getFullName() + ", haftalık programı güncelledi (" + program.getOriginalFileName() + ")");
+                    admin.getFullName() + ", yeni bir haftalık program yükledi (" + program.getOriginalFileName() + ")");
 
             return toResponse(program);
         } catch (IOException e) {
@@ -79,15 +87,12 @@ public class ProgramService {
         }
     }
 
-    public WeeklyProgramResponse getCurrentMeta() {
-        return programRepository.findTopByOrderByUploadedAtDesc()
-                .map(this::toResponse)
-                .orElseThrow(() -> new ApiException("Henüz bir program yüklenmemiş", HttpStatus.NOT_FOUND));
+    public List<WeeklyProgramResponse> listPrograms() {
+        return programRepository.findAllByOrderByUploadedAtDesc().stream().map(this::toResponse).toList();
     }
 
-    public Resource getCurrentFile() {
-        WeeklyProgram program = programRepository.findTopByOrderByUploadedAtDesc()
-                .orElseThrow(() -> new ApiException("Henüz bir program yüklenmemiş", HttpStatus.NOT_FOUND));
+    public Resource getFile(Long id) {
+        WeeklyProgram program = getProgram(id);
 
         Path path = Path.of(uploadDir).resolve(program.getStoredFileName());
         if (!Files.exists(path)) {
@@ -96,10 +101,30 @@ public class ProgramService {
         return new FileSystemResource(path);
     }
 
-    public String getCurrentContentType() {
-        return programRepository.findTopByOrderByUploadedAtDesc()
-                .map(WeeklyProgram::getContentType)
-                .orElse("application/octet-stream");
+    public String getContentType(Long id) {
+        return getProgram(id).getContentType();
+    }
+
+    @Transactional
+    public void deleteProgram(Long id, User admin) {
+        WeeklyProgram program = getProgram(id);
+
+        Path path = Path.of(uploadDir).resolve(program.getStoredFileName());
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignored) {
+            // dosya zaten yoksa veya silinemiyorsa kayıt yine de veritabanından kaldırılır
+        }
+
+        programRepository.delete(program);
+
+        activityLogService.log(admin, "PROGRAM_DELETE",
+                admin.getFullName() + ", \"" + program.getOriginalFileName() + "\" programını sildi");
+    }
+
+    private WeeklyProgram getProgram(Long id) {
+        return programRepository.findById(id)
+                .orElseThrow(() -> new ApiException("Program bulunamadı", HttpStatus.NOT_FOUND));
     }
 
     private WeeklyProgramResponse toResponse(WeeklyProgram program) {

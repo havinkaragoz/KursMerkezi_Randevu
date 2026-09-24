@@ -97,7 +97,7 @@ public class GuidanceService {
 
         List<Long> ids = windows.stream().map(GuidanceAvailability::getId).toList();
         Set<Long> bookedIds = appointmentRepository
-                .findByAvailabilityIdInAndAppointmentDateAndStatus(ids, date, AppointmentStatus.BOOKED)
+                .findByAvailabilityIdInAndAppointmentDateAndStatusNot(ids, date, AppointmentStatus.CANCELLED)
                 .stream().map(a -> a.getAvailability().getId()).collect(Collectors.toSet());
 
         return windows.stream()
@@ -117,11 +117,10 @@ public class GuidanceService {
             throw new ApiException("Seçilen tarih bu müsaitlik günüyle uyuşmuyor", HttpStatus.BAD_REQUEST);
         }
 
-        appointmentRepository
-                .findByAvailabilityIdAndAppointmentDateAndStatus(availabilityId, date, AppointmentStatus.BOOKED)
-                .ifPresent(a -> {
-                    throw new ApiException("Bu saat bu tarihte dolu", HttpStatus.CONFLICT);
-                });
+        if (appointmentRepository.existsByAvailabilityIdAndAppointmentDateAndStatusNot(
+                availabilityId, date, AppointmentStatus.CANCELLED)) {
+            throw new ApiException("Bu saat bu tarihte dolu", HttpStatus.CONFLICT);
+        }
 
         User student = getUser(studentId);
 
@@ -157,6 +156,30 @@ public class GuidanceService {
         activityLogService.log(appointment.getStudent(), "APPOINTMENT_CANCEL",
                 appointment.getStudent().getFullName() + ", " + appointment.getAppointmentDate() + " "
                         + appointment.getAvailability().getStartTime() + " tarihli randevusunu iptal etti");
+    }
+
+    @Transactional
+    public AppointmentResponse markAttendance(Long appointmentId, Long teacherId, boolean attended) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new ApiException("Randevu bulunamadı", HttpStatus.NOT_FOUND));
+
+        if (!appointment.getAvailability().getGuidanceTeacher().getId().equals(teacherId)) {
+            throw new ApiException("Bu randevuyu işaretleme yetkiniz yok", HttpStatus.FORBIDDEN);
+        }
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new ApiException("Bu randevu zaten sonuçlandırılmış", HttpStatus.BAD_REQUEST);
+        }
+
+        appointment.setStatus(attended ? AppointmentStatus.ATTENDED : AppointmentStatus.NO_SHOW);
+        appointmentRepository.save(appointment);
+
+        User teacher = appointment.getAvailability().getGuidanceTeacher();
+        activityLogService.log(teacher, attended ? "APPOINTMENT_ATTENDED" : "APPOINTMENT_NO_SHOW",
+                teacher.getFullName() + ", " + appointment.getStudent().getFullName() + " öğrencisinin "
+                        + appointment.getAppointmentDate() + " " + appointment.getAvailability().getStartTime()
+                        + " randevusunu " + (attended ? "geldi" : "gelmedi") + " olarak işaretledi");
+
+        return toAppointmentResponse(appointment);
     }
 
     public List<AppointmentResponse> myAppointments(Long studentId) {

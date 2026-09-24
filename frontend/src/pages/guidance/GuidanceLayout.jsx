@@ -1,0 +1,20 @@
+import { CalendarClock, ClipboardList, FileText, History } from 'lucide-react'
+import { Outlet } from 'react-router-dom'
+import { DashboardLayout } from '@/components/DashboardLayout'
+
+const NAV_ITEMS = [
+  { to: '/guidance', label: 'Müsaitlik', icon: CalendarClock, end: true },
+  { to: '/guidance/appointments', label: 'Randevularım', icon: ClipboardList },
+  { to: '/guidance/program', label: 'Ders Programı', icon: FileText },
+  { to: '/guidance/history', label: 'Geçmiş', icon: History },
+]
+
+export function GuidanceLayout() {
+  return (
+    <DashboardLayout title="Rehber Öğretmen Paneli" navItems={NAV_ITEMS}>
+      <div className="mx-auto max-w-2xl">
+        <Outlet />
+      </div>
+    </DashboardLayout>
+  )
+}

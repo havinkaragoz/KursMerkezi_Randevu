@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { WeeklyProgramViewer } from '@/components/WeeklyProgramViewer'
 import { Button } from '@/components/ui/button'
@@ -11,10 +11,26 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 
+const MAX_PROGRAMS = 3
+
+async function fetchPrograms() {
+  const { data } = await api.get('/programs')
+  return data
+}
+
 export function AdminProgramPage() {
+  const queryClient = useQueryClient()
   const fileInputRef = useRef(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [error, setError] = useState('')
+
+  const { data: programs } = useQuery({
+    queryKey: ['weekly-programs', refreshKey],
+    queryFn: fetchPrograms,
+  })
+
+  const count = programs?.length ?? 0
+  const atLimit = count >= MAX_PROGRAMS
 
   const uploadMutation = useMutation({
     mutationFn: (file) => {
@@ -32,9 +48,21 @@ export function AdminProgramPage() {
     },
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (id) => api.delete(`/programs/${id}`),
+    onSuccess: () => {
+      setError('')
+      setRefreshKey((v) => v + 1)
+    },
+  })
+
   function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    if (atLimit) {
+      setError(`En fazla ${MAX_PROGRAMS} program yükleyebilirsin. Yeni birini eklemek için önce birini sil.`)
+      return
+    }
     const file = fileInputRef.current?.files?.[0]
     if (!file) {
       setError('Bir dosya seç.')
@@ -48,7 +76,8 @@ export function AdminProgramPage() {
       <CardHeader>
         <CardTitle>Haftalık program</CardTitle>
         <CardDescription>
-          Yeni bir resim veya PDF yükleyince öğrenciler en son yüklenen programı görür.
+          Aynı anda en fazla {MAX_PROGRAMS} program yükleyebilirsin ({count}/{MAX_PROGRAMS}) —
+          öğrenci, öğretmen ve rehberler yüklenen tüm programları görür.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -57,14 +86,19 @@ export function AdminProgramPage() {
             ref={fileInputRef}
             type="file"
             accept="image/*,application/pdf"
-            className="text-sm text-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-2.5 file:py-1.5 file:text-sm file:font-medium"
+            disabled={atLimit}
+            className="text-sm text-foreground file:mr-3 file:rounded-lg file:border-0 file:bg-secondary file:px-2.5 file:py-1.5 file:text-sm file:font-medium disabled:opacity-50"
           />
-          <Button type="submit" size="sm" disabled={uploadMutation.isPending}>
+          <Button type="submit" size="sm" disabled={uploadMutation.isPending || atLimit}>
             Yükle
           </Button>
         </form>
         {error && <p className="text-sm text-destructive">{error}</p>}
-        <WeeklyProgramViewer refreshKey={refreshKey} />
+        <WeeklyProgramViewer
+          refreshKey={refreshKey}
+          onDelete={(id) => deleteMutation.mutate(id)}
+          deletingId={deleteMutation.isPending ? deleteMutation.variables : null}
+        />
       </CardContent>
     </Card>
   )

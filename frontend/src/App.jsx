@@ -9,7 +9,11 @@ import { StudentQueuePage } from '@/pages/student/StudentQueuePage'
 import { GuidanceBooking } from '@/pages/student/GuidanceBooking'
 import { StudentProgramPage } from '@/pages/student/StudentProgramPage'
 import { TeacherDashboard } from '@/pages/teacher/TeacherDashboard'
-import { GuidanceDashboard } from '@/pages/guidance/GuidanceDashboard'
+import { GuidanceLayout } from '@/pages/guidance/GuidanceLayout'
+import { GuidanceAvailabilityPage } from '@/pages/guidance/GuidanceAvailabilityPage'
+import { GuidanceAppointmentsPage } from '@/pages/guidance/GuidanceAppointmentsPage'
+import { GuidanceProgramPage } from '@/pages/guidance/GuidanceProgramPage'
+import { GuidanceHistoryPage } from '@/pages/guidance/GuidanceHistoryPage'
 import { AdminLayout } from '@/pages/admin/AdminLayout'
 import { AdminAnnouncementPage } from '@/pages/admin/AdminAnnouncementPage'
 import { AdminUsersPage } from '@/pages/admin/AdminUsersPage'
@@ -51,7 +55,12 @@ function AppRoutes() {
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['GUIDANCE']} />}>
-        <Route path="/guidance" element={<GuidanceDashboard />} />
+        <Route path="/guidance" element={<GuidanceLayout />}>
+          <Route index element={<GuidanceAvailabilityPage />} />
+          <Route path="appointments" element={<GuidanceAppointmentsPage />} />
+          <Route path="program" element={<GuidanceProgramPage />} />
+          <Route path="history" element={<GuidanceHistoryPage />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>

@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
+import { Button } from '@/components/ui/button'
 
-async function fetchMeta() {
-  try {
-    const { data } = await api.get('/programs/current')
-    return data
-  } catch (err) {
-    if (err.response?.status === 404) return null
-    throw err
-  }
+async function fetchPrograms() {
+  const { data } = await api.get('/programs')
+  return data
 }
 
 function formatDate(value) {
@@ -23,45 +19,46 @@ function formatDate(value) {
   })
 }
 
-export function WeeklyProgramViewer({ refreshKey }) {
-  const { data: meta, isLoading } = useQuery({
-    queryKey: ['weekly-program-meta', refreshKey],
-    queryFn: fetchMeta,
-  })
+function ProgramItem({ program, onDelete, deleting }) {
   const [fileUrl, setFileUrl] = useState(null)
 
   useEffect(() => {
     let objectUrl
     let cancelled = false
 
-    if (meta) {
-      api.get('/programs/current/file', { responseType: 'blob' }).then((res) => {
-        if (cancelled) return
-        objectUrl = URL.createObjectURL(res.data)
-        setFileUrl(objectUrl)
-      })
-    } else {
-      setFileUrl(null)
-    }
+    api.get(`/programs/${program.id}/file`, { responseType: 'blob' }).then((res) => {
+      if (cancelled) return
+      objectUrl = URL.createObjectURL(res.data)
+      setFileUrl(objectUrl)
+    })
 
     return () => {
       cancelled = true
       if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
-  }, [meta?.id])
+  }, [program.id])
 
-  if (isLoading) return <p className="text-muted-foreground">Yükleniyor...</p>
-  if (!meta) return <p className="text-muted-foreground">Henüz bir program yüklenmemiş.</p>
-
-  const isImage = meta.contentType?.startsWith('image/')
+  const isImage = program.contentType?.startsWith('image/')
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-sm text-muted-foreground">
-        {meta.uploadedByFullName} tarafından {formatDate(meta.uploadedAt)} yüklendi
-      </p>
+    <div className="flex flex-col gap-2 rounded-lg border p-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm text-muted-foreground">
+          {program.uploadedByFullName} tarafından {formatDate(program.uploadedAt)} yüklendi
+        </p>
+        {onDelete && (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={deleting}
+            onClick={() => onDelete(program.id)}
+          >
+            Sil
+          </Button>
+        )}
+      </div>
       {fileUrl && isImage && (
-        <img src={fileUrl} alt="Haftalık program" className="w-full rounded-lg border" />
+        <img src={fileUrl} alt={program.originalFileName} className="w-full rounded-lg border" />
       )}
       {fileUrl && !isImage && (
         <a
@@ -70,9 +67,34 @@ export function WeeklyProgramViewer({ refreshKey }) {
           rel="noreferrer"
           className="text-sm text-primary underline"
         >
-          {meta.originalFileName} dosyasını aç (PDF)
+          {program.originalFileName} dosyasını aç (PDF)
         </a>
       )}
+    </div>
+  )
+}
+
+export function WeeklyProgramViewer({ refreshKey, onDelete, deletingId }) {
+  const { data: programs, isLoading } = useQuery({
+    queryKey: ['weekly-programs', refreshKey],
+    queryFn: fetchPrograms,
+  })
+
+  if (isLoading) return <p className="text-muted-foreground">Yükleniyor...</p>
+  if (!programs || programs.length === 0) {
+    return <p className="text-muted-foreground">Henüz bir program yüklenmemiş.</p>
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {programs.map((program) => (
+        <ProgramItem
+          key={program.id}
+          program={program}
+          onDelete={onDelete}
+          deleting={deletingId === program.id}
+        />
+      ))}
     </div>
   )
 }

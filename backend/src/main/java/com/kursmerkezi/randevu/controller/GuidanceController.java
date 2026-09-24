@@ -68,6 +68,14 @@ public class GuidanceController {
         guidanceService.cancelAppointment(appointmentId, principal.getId());
     }
 
+    @PutMapping("/appointments/{appointmentId}/attendance")
+    @PreAuthorize("hasRole('GUIDANCE')")
+    public AppointmentResponse markAttendance(@AuthenticationPrincipal UserPrincipal principal,
+                                               @PathVariable Long appointmentId,
+                                               @RequestParam boolean attended) {
+        return guidanceService.markAttendance(appointmentId, principal.getId(), attended);
+    }
+
     @GetMapping("/appointments/mine")
     @PreAuthorize("hasRole('STUDENT')")
     public List<AppointmentResponse> myAppointments(@AuthenticationPrincipal UserPrincipal principal) {
