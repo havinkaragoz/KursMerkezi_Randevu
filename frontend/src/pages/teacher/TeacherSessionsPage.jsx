@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { AnnouncementBanner } from '@/components/AnnouncementBanner'
+import { queueSlotRange } from '@/lib/queueSlot'
 
 function formatDateTime(value) {
   if (!value) return null
@@ -182,12 +183,13 @@ export function TeacherSessionsPage() {
                     <TableRow>
                       <TableHead className="w-12">#</TableHead>
                       <TableHead>Öğrenci</TableHead>
+                      <TableHead>Saat</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {session.waitingList.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={2} className="text-muted-foreground">
+                        <TableCell colSpan={3} className="text-muted-foreground">
                           Kuyrukta kimse yok.
                         </TableCell>
                       </TableRow>
@@ -196,6 +198,9 @@ export function TeacherSessionsPage() {
                       <TableRow key={entry.entryId}>
                         <TableCell>{entry.position}</TableCell>
                         <TableCell>{entry.studentFullName}</TableCell>
+                        <TableCell>
+                          {queueSlotRange(session.sessionTime, entry.position) ?? '-'}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

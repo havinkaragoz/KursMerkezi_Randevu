@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { AnnouncementBanner } from '@/components/AnnouncementBanner'
+import { queueSlotRange } from '@/lib/queueSlot'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -83,6 +84,8 @@ export function StudentHome() {
                 <span className="text-sm font-medium">{session.title}</span>
                 <span className="text-sm text-muted-foreground">
                   {session.teacherFullName} · {entry.position}. sıradasın
+                  {queueSlotRange(session.sessionTime, entry.position) &&
+                    ` · ${queueSlotRange(session.sessionTime, entry.position)}`}
                 </span>
               </div>
               <Button

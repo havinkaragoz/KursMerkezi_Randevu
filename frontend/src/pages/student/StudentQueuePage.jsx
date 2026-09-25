@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CalendarClock, Users } from 'lucide-react'
 import { api } from '@/lib/api'
+import { queueSlotRange } from '@/lib/queueSlot'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -86,6 +87,9 @@ export function StudentQueuePage() {
                 <div className="flex items-center justify-between">
                   <p className="text-sm">
                     Sıradasın: <span className="font-semibold">{myEntry.position}.</span> sırada
+                    {queueSlotRange(session.sessionTime, myEntry.position) && (
+                      <> · <span className="font-semibold">{queueSlotRange(session.sessionTime, myEntry.position)}</span></>
+                    )}
                   </p>
                   <Button
                     variant="outline"
