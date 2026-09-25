@@ -1,26 +1,26 @@
-import { Landmark } from 'lucide-react'
+import emblem from '@/assets/hipokrat-emblem.png'
 import { cn } from '@/lib/utils'
 
 const SIZES = {
-  sm: { text: 'text-base', icon: 14, iconBox: 'size-5 border-2', sub: 'text-[8px]' },
-  md: { text: 'text-2xl', icon: 20, iconBox: 'size-8 border-[3px]', sub: 'text-[10px]' },
-  lg: { text: 'text-4xl sm:text-5xl', icon: 30, iconBox: 'size-11 sm:size-13 border-[3px]', sub: 'text-xs' },
+  sm: { text: 'text-base', icon: 22, sub: 'text-[8px]' },
+  md: { text: 'text-2xl', icon: 32, sub: 'text-[10px]' },
+  lg: { text: 'text-4xl sm:text-5xl', icon: 46, sub: 'text-xs' },
 }
 
 const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight'
 
 function Wordmark({ s, tone }) {
   return (
-    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-anthracite-foreground' : 'text-foreground')}>
+    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-anthracite-foreground' : 'text-brand-anthracite')}>
       <span>HİP</span>
-      <span
-        className={cn(
-          'mx-0.5 inline-flex items-center justify-center rounded-full border-brand-gold text-brand-gold',
-          s.iconBox,
-        )}
-      >
-        <Landmark size={s.icon} strokeWidth={2.5} />
-      </span>
+      <img
+        src={emblem}
+        alt=""
+        width={s.icon}
+        height={s.icon}
+        className="mx-0.5 inline-block shrink-0"
+        style={{ width: s.icon, height: s.icon }}
+      />
       <span>KRAT</span>
     </div>
   )

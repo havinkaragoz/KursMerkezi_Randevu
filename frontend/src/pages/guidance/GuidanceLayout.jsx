@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export function GuidanceLayout() {
   return (
-    <DashboardLayout title="Rehber Öğretmen Paneli" navItems={NAV_ITEMS}>
+    <DashboardLayout navItems={NAV_ITEMS}>
       <div className="mx-auto max-w-2xl">
         <Outlet />
       </div>

@@ -9,7 +9,7 @@ const NAV_ITEMS = [
 
 export function TeacherLayout() {
   return (
-    <DashboardLayout title="Öğretmen Paneli" navItems={NAV_ITEMS}>
+    <DashboardLayout navItems={NAV_ITEMS}>
       <div className="mx-auto max-w-2xl">
         <Outlet />
       </div>

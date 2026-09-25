@@ -5,7 +5,7 @@ import { HipokratLogo } from '@/components/HipokratLogo'
 import { cn } from '@/lib/utils'
 import { ROLE_LABELS } from '@/lib/roleLabels'
 
-export function DashboardLayout({ title, navItems, children }) {
+export function DashboardLayout({ navItems, children }) {
   const { user, logout } = useAuth()
 
   return (
@@ -60,7 +60,7 @@ export function DashboardLayout({ title, navItems, children }) {
 
       <div className="min-w-0 flex-1">
         <header className="border-b bg-background px-8 py-5">
-          <h1 className="text-xl font-semibold">{title}</h1>
+          <h1 className="text-xl font-semibold">Hoş geldiniz, {user?.fullName}</h1>
         </header>
         <main className="p-8">{children}</main>
       </div>

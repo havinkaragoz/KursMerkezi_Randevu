@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export function AdminLayout() {
   return (
-    <DashboardLayout title="Admin Paneli" navItems={NAV_ITEMS}>
+    <DashboardLayout navItems={NAV_ITEMS}>
       <div className="mx-auto max-w-3xl">
         <Outlet />
       </div>

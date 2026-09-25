@@ -11,7 +11,7 @@ const NAV_ITEMS = [
 
 export function StudentLayout() {
   return (
-    <DashboardLayout title="Öğrenci Paneli" navItems={NAV_ITEMS}>
+    <DashboardLayout navItems={NAV_ITEMS}>
       <div className="mx-auto max-w-2xl">
         <Outlet />
       </div>
