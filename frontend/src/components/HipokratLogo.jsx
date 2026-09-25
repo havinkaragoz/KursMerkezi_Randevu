@@ -1,4 +1,5 @@
 import emblem from '@/assets/hipokrat-emblem.png'
+import emblemWhite from '@/assets/hipokrat-emblem-white.png'
 import { cn } from '@/lib/utils'
 
 const SIZES = {
@@ -14,7 +15,7 @@ function Wordmark({ s, tone }) {
     <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-gold' : 'text-brand-anthracite')}>
       <span>HİP</span>
       <img
-        src={emblem}
+        src={tone === 'light' ? emblemWhite : emblem}
         alt=""
         width={s.icon}
         height={s.icon}
