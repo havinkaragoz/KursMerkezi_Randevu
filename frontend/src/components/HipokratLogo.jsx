@@ -1,56 +1,54 @@
-import emblem from '@/assets/hipokrat-emblem.png'
 import emblemWhite from '@/assets/hipokrat-emblem-white.png'
+import fullLogo from '@/assets/hipokrat-full-logo.png'
 import { cn } from '@/lib/utils'
 
 const SIZES = {
-  sm: { text: 'text-base', icon: 22, sub: 'text-[8px]' },
-  md: { text: 'text-2xl', icon: 32, sub: 'text-[10px]' },
-  lg: { text: 'text-5xl sm:text-6xl', icon: 58, sub: 'text-sm' },
+  sm: { text: 'text-base', icon: 22 },
+  md: { text: 'text-2xl', icon: 32 },
+  lg: { text: 'text-5xl sm:text-6xl', icon: 58 },
 }
 
-const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight'
-
-function Wordmark({ s, tone }) {
-  return (
-    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-gold' : 'text-brand-anthracite')}>
-      <span>HİP</span>
-      <img
-        src={tone === 'light' ? emblemWhite : emblem}
-        alt=""
-        width={s.icon}
-        height={s.icon}
-        className="mx-0.5 inline-block shrink-0"
-        style={{ width: s.icon, height: s.icon }}
-      />
-      <span>KRAT</span>
-    </div>
-  )
+const FULL_WIDTHS = {
+  sm: 'w-48',
+  md: 'w-64',
+  lg: 'w-72 sm:w-80',
 }
 
 /**
- * variant "full" — icon + wordmark + underline + tagline, for surfaces with room to breathe
- * (login screen). variant "compact" — icon + wordmark only, for persistent app chrome
- * (the anthracite sidebar) where the tagline would just add noise — wordmark text renders
- * gold since it always sits on the dark sidebar, matching the brand's dark-background lockup.
+ * variant "full" — the real HİPOKRAT lockup image (wordmark + emblem + underline + tagline,
+ * letters shaped around the icon) for surfaces with room to breathe (login screen). Rendered
+ * as a single asset rather than recomposed from text, since the P/K letterforms are custom-cut
+ * around the emblem and can't be reproduced with a web font.
+ * variant "compact" — icon + wordmark only (text + separate icon image), for persistent app
+ * chrome (the anthracite sidebar) where the full lockup image would be too wide/detailed at
+ * small sizes — wordmark text renders gold, emblem renders as a white line-art silhouette,
+ * both matching the brand's dark-background treatment.
  */
 export function HipokratLogo({ size = 'md', variant = 'full', className }) {
   const s = SIZES[size] ?? SIZES.md
 
   if (variant === 'compact') {
     return (
-      <div className={cn('flex', className)}>
-        <Wordmark s={s} tone="light" />
+      <div className={cn('flex items-center font-heading font-extrabold tracking-tight text-brand-gold', s.text, className)}>
+        <span>HİP</span>
+        <img
+          src={emblemWhite}
+          alt=""
+          width={s.icon}
+          height={s.icon}
+          className="mx-0.5 inline-block shrink-0"
+          style={{ width: s.icon, height: s.icon }}
+        />
+        <span>KRAT</span>
       </div>
     )
   }
 
   return (
-    <div className={cn('flex flex-col items-center', className)}>
-      <Wordmark s={s} />
-      <div className="mt-0.5 h-0.5 w-full bg-brand-gold" />
-      <p className={cn('mt-1 font-semibold tracking-wide text-brand-gold', s.sub)}>
-        EĞİTİM &amp; DANIŞMANLIK VE KÜTÜPHANE
-      </p>
-    </div>
+    <img
+      src={fullLogo}
+      alt="HİPOKRAT Eğitim & Danışmanlık ve Kütüphane"
+      className={cn('h-auto', FULL_WIDTHS[size] ?? FULL_WIDTHS.md, className)}
+    />
   )
 }
