@@ -11,7 +11,7 @@ const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-t
 
 function Wordmark({ s, tone }) {
   return (
-    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-anthracite-foreground' : 'text-brand-anthracite')}>
+    <div className={cn(WORDMARK_CLASS, s.text, tone === 'light' ? 'text-brand-gold' : 'text-brand-anthracite')}>
       <span>HİP</span>
       <img
         src={emblem}
@@ -30,7 +30,7 @@ function Wordmark({ s, tone }) {
  * variant "full" — icon + wordmark + underline + tagline, for surfaces with room to breathe
  * (login screen). variant "compact" — icon + wordmark only, for persistent app chrome
  * (the anthracite sidebar) where the tagline would just add noise — wordmark text renders
- * light since it always sits on the dark sidebar, regardless of the app's light/dark theme.
+ * gold since it always sits on the dark sidebar, matching the brand's dark-background lockup.
  */
 export function HipokratLogo({ size = 'md', variant = 'full', className }) {
   const s = SIZES[size] ?? SIZES.md
