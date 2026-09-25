@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CalendarClock, Users } from 'lucide-react'
+import { CalendarClock, Check, Users, X } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useAuth } from '@/context/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import { cn } from '@/lib/utils'
 import {
   Card,
   CardContent,
@@ -71,8 +72,9 @@ export function TeacherSessionsPage() {
     onSuccess: invalidate,
   })
 
-  const nextMutation = useMutation({
-    mutationFn: (id) => api.post(`/queue/sessions/${id}/next`),
+  const attendanceMutation = useMutation({
+    mutationFn: ({ sessionId, entryId, attended }) =>
+      api.put(`/queue/sessions/${sessionId}/entries/${entryId}/attendance`, null, { params: { attended } }),
     onSuccess: invalidate,
   })
 
@@ -184,12 +186,13 @@ export function TeacherSessionsPage() {
                       <TableHead className="w-12">#</TableHead>
                       <TableHead>Öğrenci</TableHead>
                       <TableHead>Saat</TableHead>
+                      <TableHead className="text-right">İşlem</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {session.waitingList.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={3} className="text-muted-foreground">
+                        <TableCell colSpan={4} className="text-muted-foreground">
                           Kuyrukta kimse yok.
                         </TableCell>
                       </TableRow>
@@ -201,18 +204,48 @@ export function TeacherSessionsPage() {
                         <TableCell>
                           {queueSlotRange(session.sessionTime, entry.position) ?? '-'}
                         </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              type="button"
+                              title="Geldi"
+                              disabled={attendanceMutation.isPending}
+                              onClick={() =>
+                                attendanceMutation.mutate({
+                                  sessionId: session.id,
+                                  entryId: entry.entryId,
+                                  attended: true,
+                                })
+                              }
+                              className={cn(
+                                'inline-flex size-7 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 transition-colors hover:bg-emerald-500/20 dark:text-emerald-400',
+                              )}
+                            >
+                              <Check size={15} strokeWidth={2.75} />
+                            </button>
+                            <button
+                              type="button"
+                              title="Gelmedi"
+                              disabled={attendanceMutation.isPending}
+                              onClick={() =>
+                                attendanceMutation.mutate({
+                                  sessionId: session.id,
+                                  entryId: entry.entryId,
+                                  attended: false,
+                                })
+                              }
+                              className={cn(
+                                'inline-flex size-7 items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-600 transition-colors hover:bg-red-500/20 dark:text-red-400',
+                              )}
+                            >
+                              <X size={15} strokeWidth={2.75} />
+                            </button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
-                <Button
-                  className="self-start"
-                  size="sm"
-                  disabled={session.waitingList.length === 0 || nextMutation.isPending}
-                  onClick={() => nextMutation.mutate(session.id)}
-                >
-                  Sıradakini tamamla
-                </Button>
               </CardContent>
             </Card>
           )

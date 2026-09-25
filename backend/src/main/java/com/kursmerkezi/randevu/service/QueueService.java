@@ -126,24 +126,29 @@ public class QueueService {
     }
 
     @Transactional
-    public QueueSessionResponse completeNext(Long sessionId, Long teacherId) {
+    public QueueSessionResponse markEntryAttendance(Long sessionId, Long entryId, Long teacherId, boolean attended) {
         QueueSession session = getSession(sessionId);
         if (!session.getTeacher().getId().equals(teacherId)) {
             throw new ApiException("Bu oturumu yönetme yetkiniz yok", HttpStatus.FORBIDDEN);
         }
 
-        List<QueueEntry> waiting = entryRepository.findBySessionIdAndStatusOrderByJoinedAtAsc(sessionId, QueueEntryStatus.WAITING);
-        if (waiting.isEmpty()) {
-            throw new ApiException("Kuyrukta bekleyen öğrenci yok", HttpStatus.BAD_REQUEST);
+        QueueEntry entry = entryRepository.findById(entryId)
+                .orElseThrow(() -> new ApiException("Kayıt bulunamadı", HttpStatus.NOT_FOUND));
+        if (!entry.getSession().getId().equals(sessionId)) {
+            throw new ApiException("Bu kayıt bu oturuma ait değil", HttpStatus.BAD_REQUEST);
+        }
+        if (entry.getStatus() != QueueEntryStatus.WAITING) {
+            throw new ApiException("Bu öğrenci zaten işaretlenmiş", HttpStatus.BAD_REQUEST);
         }
 
-        QueueEntry first = waiting.get(0);
-        first.setStatus(QueueEntryStatus.DONE);
-        entryRepository.save(first);
+        entry.setStatus(attended ? QueueEntryStatus.DONE : QueueEntryStatus.NO_SHOW);
+        entryRepository.save(entry);
 
-        activityLogService.log(session.getTeacher(), "QUEUE_COMPLETE",
-                session.getTeacher().getFullName() + ", " + first.getStudent().getFullName()
-                        + " adlı öğrenciyi \"" + session.getTitle() + "\" oturumunda tamamladı");
+        activityLogService.log(session.getTeacher(),
+                attended ? "QUEUE_ATTENDED" : "QUEUE_NO_SHOW",
+                session.getTeacher().getFullName() + ", " + entry.getStudent().getFullName()
+                        + " adlı öğrenciyi \"" + session.getTitle() + "\" oturumunda "
+                        + (attended ? "geldi" : "gelmedi") + " olarak işaretledi");
 
         return toResponse(session);
     }

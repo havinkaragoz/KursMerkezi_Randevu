@@ -54,9 +54,12 @@ public class QueueController {
         return queueService.leaveQueue(id, principal.getId());
     }
 
-    @PostMapping("/{id}/next")
+    @PutMapping("/{id}/entries/{entryId}/attendance")
     @PreAuthorize("hasRole('TEACHER')")
-    public QueueSessionResponse completeNext(@AuthenticationPrincipal UserPrincipal principal, @PathVariable Long id) {
-        return queueService.completeNext(id, principal.getId());
+    public QueueSessionResponse markEntryAttendance(@AuthenticationPrincipal UserPrincipal principal,
+                                                      @PathVariable Long id,
+                                                      @PathVariable Long entryId,
+                                                      @RequestParam boolean attended) {
+        return queueService.markEntryAttendance(id, entryId, principal.getId(), attended);
     }
 }
