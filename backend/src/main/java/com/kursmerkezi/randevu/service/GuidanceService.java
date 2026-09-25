@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -115,8 +116,9 @@ public class GuidanceService {
         GuidanceAvailability availability = availabilityRepository.findById(availabilityId)
                 .orElseThrow(() -> new ApiException("Müsaitlik bulunamadı", HttpStatus.NOT_FOUND));
 
-        if (date.isBefore(LocalDate.now())) {
-            throw new ApiException("Geçmiş bir tarihe randevu alınamaz", HttpStatus.BAD_REQUEST);
+        if (date.isBefore(LocalDate.now())
+                || (date.isEqual(LocalDate.now()) && availability.getStartTime().isBefore(LocalTime.now()))) {
+            throw new ApiException("Geçmiş bir tarihe/saate randevu alınamaz", HttpStatus.BAD_REQUEST);
         }
         if (date.getDayOfWeek() != availability.getDayOfWeek()) {
             throw new ApiException("Seçilen tarih bu müsaitlik günüyle uyuşmuyor", HttpStatus.BAD_REQUEST);

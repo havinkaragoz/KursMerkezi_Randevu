@@ -58,11 +58,18 @@ public class ProgramService {
             Path dir = Path.of(uploadDir);
             Files.createDirectories(dir);
 
-            String extension = "";
+            // Uzantı asla istemcinin gönderdiği dosya adından türetilmez (path traversal riski) —
+            // sadece daha önce doğrulanmış content-type'a göre sabit bir listeden seçilir.
+            String extension = switch (contentType) {
+                case "image/jpeg" -> ".jpg";
+                case "image/png" -> ".png";
+                case "image/gif" -> ".gif";
+                case "image/webp" -> ".webp";
+                case "image/svg+xml" -> ".svg";
+                case "application/pdf" -> ".pdf";
+                default -> "";
+            };
             String original = file.getOriginalFilename();
-            if (original != null && original.contains(".")) {
-                extension = original.substring(original.lastIndexOf('.'));
-            }
             String storedFileName = UUID.randomUUID() + extension;
 
             Path target = dir.resolve(storedFileName);
