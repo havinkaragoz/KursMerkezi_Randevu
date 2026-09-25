@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 export function StudentLayout() {
   return (
     <DashboardLayout navItems={NAV_ITEMS}>
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-5xl">
         <Outlet />
       </div>
     </DashboardLayout>

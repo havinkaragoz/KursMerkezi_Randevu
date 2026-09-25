@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 const SIZES = {
   sm: { text: 'text-base', icon: 22, sub: 'text-[8px]' },
   md: { text: 'text-2xl', icon: 32, sub: 'text-[10px]' },
-  lg: { text: 'text-4xl sm:text-5xl', icon: 46, sub: 'text-xs' },
+  lg: { text: 'text-5xl sm:text-6xl', icon: 58, sub: 'text-sm' },
 }
 
 const WORDMARK_CLASS = 'flex items-center font-heading font-extrabold tracking-tight'

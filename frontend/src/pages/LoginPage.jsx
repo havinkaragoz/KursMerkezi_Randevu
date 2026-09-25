@@ -45,13 +45,13 @@ export function LoginPage() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-4">
       <HipokratLogo size="lg" />
-      <Card className="w-full max-w-sm">
+      <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Randevu Sistemi</CardTitle>
-          <CardDescription>Giriş yapmak için bilgilerinizi girin</CardDescription>
+          <CardTitle className="text-2xl">Randevu Sistemi</CardTitle>
+          <CardDescription className="text-base">Giriş yapmak için bilgilerinizi girin</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <Label htmlFor="username">Kullanıcı adı</Label>
               <Input

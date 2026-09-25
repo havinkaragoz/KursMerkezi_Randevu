@@ -10,9 +10,9 @@ export function DashboardLayout({ navItems, children }) {
 
   return (
     <div className="flex min-h-svh bg-muted">
-      <aside className="flex w-60 shrink-0 flex-col justify-between bg-brand-anthracite px-4 py-5">
+      <aside className="sticky top-0 flex h-svh w-60 shrink-0 flex-col justify-between overflow-y-auto bg-brand-anthracite px-4 py-5">
         <div className="flex flex-col gap-6">
-          <HipokratLogo variant="compact" size="sm" className="px-1" />
+          <HipokratLogo variant="compact" size="md" className="w-full justify-center py-1" />
 
           {navItems && navItems.length > 0 && (
             <nav className="flex flex-col gap-1">
