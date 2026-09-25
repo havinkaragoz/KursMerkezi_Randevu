@@ -74,9 +74,9 @@ function ProgramItem({ program, onDelete, deleting }) {
             />
           </button>
           <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
-            <DialogContent className="max-h-[92vh] max-w-[95vw] overflow-auto sm:max-w-[95vw]">
+            <DialogContent className="w-auto max-w-[95vw] gap-0 overflow-auto p-2 sm:max-w-[95vw]">
               <DialogTitle className="sr-only">{program.originalFileName}</DialogTitle>
-              <img src={fileUrl} alt={program.originalFileName} className="max-h-[85vh] w-auto max-w-full" />
+              <img src={fileUrl} alt={program.originalFileName} className="block max-h-[85vh] w-auto max-w-full" />
             </DialogContent>
           </Dialog>
         </>
