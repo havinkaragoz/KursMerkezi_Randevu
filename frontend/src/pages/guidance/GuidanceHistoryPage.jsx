@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { Search } from 'lucide-react'
 import { api } from '@/lib/api'
+import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -45,13 +48,18 @@ async function fetchTeacherAppointments() {
 }
 
 export function GuidanceHistoryPage() {
+  const [search, setSearch] = useState('')
+
   const { data: appointments, isLoading } = useQuery({
     queryKey: ['guidance-teacher-appointments'],
     queryFn: fetchTeacherAppointments,
     refetchInterval: 10000,
   })
 
-  const past = appointments?.filter((a) => a.status !== 'BOOKED') ?? []
+  const query = search.trim().toLocaleLowerCase('tr-TR')
+  const past = (appointments ?? [])
+    .filter((a) => a.status !== 'BOOKED')
+    .filter((a) => !query || a.studentFullName.toLocaleLowerCase('tr-TR').includes(query))
 
   return (
     <Card className="text-left shadow-sm">
@@ -59,7 +67,20 @@ export function GuidanceHistoryPage() {
         <CardTitle>Geçmiş</CardTitle>
         <CardDescription>Sonuçlanmış tüm rehberlik randevuları.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-4">
+        <div className="relative max-w-sm">
+          <Search
+            size={16}
+            className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            placeholder="Öğrenci adıyla ara"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
         {isLoading && <p className="text-muted-foreground">Yükleniyor...</p>}
         {!isLoading && (
           <Table>
@@ -75,7 +96,7 @@ export function GuidanceHistoryPage() {
               {past.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={4} className="text-muted-foreground">
-                    Henüz sonuçlanmış randevu yok.
+                    {query ? 'Bu aramayla eşleşen randevu yok.' : 'Henüz sonuçlanmış randevu yok.'}
                   </TableCell>
                 </TableRow>
               )}
