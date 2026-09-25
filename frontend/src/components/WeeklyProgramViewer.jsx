@@ -58,7 +58,7 @@ function ProgramItem({ program, onDelete, deleting }) {
         )}
       </div>
       {fileUrl && isImage && (
-        <img src={fileUrl} alt={program.originalFileName} className="w-full rounded-lg border" />
+        <img src={fileUrl} alt={program.originalFileName} className="max-w-full self-start rounded-lg border" />
       )}
       {fileUrl && !isImage && (
         <a
