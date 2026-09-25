@@ -9,4 +9,5 @@ import java.util.List;
 public interface QueueSessionRepository extends JpaRepository<QueueSession, Long> {
     List<QueueSession> findByStatus(QueueStatus status);
     List<QueueSession> findByTeacherId(Long teacherId);
+    boolean existsByTeacherId(Long teacherId);
 }

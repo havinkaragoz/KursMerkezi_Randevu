@@ -61,6 +61,7 @@ export function AdminUsersPage() {
   const [open, setOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [error, setError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -82,7 +83,13 @@ export function AdminUsersPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/admin/users/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
+    onSuccess: () => {
+      setDeleteError('')
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+    },
+    onError: (err) => {
+      setDeleteError(err.response?.data?.message ?? 'Kullanıcı silinemedi.')
+    },
   })
 
   function handleSubmit(e) {
@@ -162,7 +169,8 @@ export function AdminUsersPage() {
           </Dialog>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-3">
+        {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
         {isLoading && <p className="text-muted-foreground">Yükleniyor...</p>}
         {!isLoading && (
           <Table>

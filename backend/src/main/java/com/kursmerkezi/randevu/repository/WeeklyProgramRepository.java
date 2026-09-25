@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface WeeklyProgramRepository extends JpaRepository<WeeklyProgram, Long> {
     List<WeeklyProgram> findAllByOrderByUploadedAtDesc();
+    boolean existsByUploadedById(Long uploadedById);
 }

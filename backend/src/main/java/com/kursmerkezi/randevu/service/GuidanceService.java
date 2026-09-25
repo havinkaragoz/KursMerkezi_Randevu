@@ -78,6 +78,11 @@ public class GuidanceService {
         if (!availability.getGuidanceTeacher().getId().equals(teacherId)) {
             throw new ApiException("Bu müsaitliği silme yetkiniz yok", HttpStatus.FORBIDDEN);
         }
+        if (appointmentRepository.existsByAvailabilityId(availabilityId)) {
+            throw new ApiException(
+                    "Bu müsaitliğe bağlı randevu kayıtları olduğu için silinemez",
+                    HttpStatus.CONFLICT);
+        }
 
         availabilityRepository.delete(availability);
 

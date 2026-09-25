@@ -12,4 +12,6 @@ public interface QueueEntryRepository extends JpaRepository<QueueEntry, Long> {
     List<QueueEntry> findBySessionIdAndStatusOrderByJoinedAtAsc(Long sessionId, QueueEntryStatus status);
 
     Optional<QueueEntry> findBySessionIdAndStudentIdAndStatus(Long sessionId, Long studentId, QueueEntryStatus status);
+
+    boolean existsByStudentId(Long studentId);
 }

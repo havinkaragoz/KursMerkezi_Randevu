@@ -3,8 +3,14 @@ package com.kursmerkezi.randevu.service;
 import com.kursmerkezi.randevu.dto.CreateUserRequest;
 import com.kursmerkezi.randevu.dto.UserResponse;
 import com.kursmerkezi.randevu.exception.ApiException;
+import com.kursmerkezi.randevu.model.Role;
 import com.kursmerkezi.randevu.model.User;
+import com.kursmerkezi.randevu.repository.AppointmentRepository;
+import com.kursmerkezi.randevu.repository.GuidanceAvailabilityRepository;
+import com.kursmerkezi.randevu.repository.QueueEntryRepository;
+import com.kursmerkezi.randevu.repository.QueueSessionRepository;
 import com.kursmerkezi.randevu.repository.UserRepository;
+import com.kursmerkezi.randevu.repository.WeeklyProgramRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +25,11 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActivityLogService activityLogService;
+    private final QueueSessionRepository queueSessionRepository;
+    private final QueueEntryRepository queueEntryRepository;
+    private final GuidanceAvailabilityRepository guidanceAvailabilityRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final WeeklyProgramRepository weeklyProgramRepository;
 
     public UserResponse createUser(Long adminId, CreateUserRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -49,6 +60,21 @@ public class AdminService {
     public void deleteUser(Long adminId, Long id) {
         User target = userRepository.findById(id)
                 .orElseThrow(() -> new ApiException("Kullanıcı bulunamadı", HttpStatus.NOT_FOUND));
+
+        if (target.getRole() == Role.ADMIN && userRepository.countByRole(Role.ADMIN) <= 1) {
+            throw new ApiException("Sistemde en az bir admin hesabı kalmalı, bu hesap silinemez", HttpStatus.CONFLICT);
+        }
+
+        boolean hasHistory = queueSessionRepository.existsByTeacherId(id)
+                || queueEntryRepository.existsByStudentId(id)
+                || guidanceAvailabilityRepository.existsByGuidanceTeacherId(id)
+                || appointmentRepository.existsByStudentId(id)
+                || weeklyProgramRepository.existsByUploadedById(id);
+        if (hasHistory) {
+            throw new ApiException(
+                    "Bu kullanıcının sistemde geçmiş kayıtları (oturum, randevu, program vb.) olduğu için silinemez",
+                    HttpStatus.CONFLICT);
+        }
 
         User admin = getUser(adminId);
 

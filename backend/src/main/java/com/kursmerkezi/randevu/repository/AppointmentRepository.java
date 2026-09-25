@@ -9,7 +9,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     List<Appointment> findByStudentId(Long studentId);
 
+    boolean existsByStudentId(Long studentId);
+
     List<Appointment> findByAvailabilityGuidanceTeacherId(Long guidanceTeacherId);
+
+    boolean existsByAvailabilityId(Long availabilityId);
 
     boolean existsByAvailabilityIdAndAppointmentDateAndStatusNot(
             Long availabilityId, LocalDate appointmentDate, AppointmentStatus excludedStatus);

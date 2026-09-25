@@ -48,6 +48,7 @@ export function GuidanceAvailabilityPage() {
   const [day, setDay] = useState('MONDAY')
   const [startTime, setStartTime] = useState('')
   const [error, setError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   const { data: availability, isLoading } = useQuery({
     queryKey: ['guidance-my-availability'],
@@ -68,7 +69,13 @@ export function GuidanceAvailabilityPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id) => api.delete(`/guidance/availability/${id}`),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['guidance-my-availability'] }),
+    onSuccess: () => {
+      setDeleteError('')
+      queryClient.invalidateQueries({ queryKey: ['guidance-my-availability'] })
+    },
+    onError: (err) => {
+      setDeleteError(err.response?.data?.message ?? 'Müsaitlik silinemedi.')
+    },
   })
 
   function handleSubmit(e) {
@@ -138,6 +145,7 @@ export function GuidanceAvailabilityPage() {
           <CardTitle>Haftalık programım</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          {deleteError && <p className="text-sm text-destructive">{deleteError}</p>}
           {isLoading && <p className="text-muted-foreground">Yükleniyor...</p>}
           {!isLoading &&
             groupedByDay.map((d) => (

@@ -10,4 +10,6 @@ public interface GuidanceAvailabilityRepository extends JpaRepository<GuidanceAv
 
     List<GuidanceAvailability> findByGuidanceTeacherIdAndDayOfWeekOrderByStartTimeAsc(
             Long guidanceTeacherId, DayOfWeek dayOfWeek);
+
+    boolean existsByGuidanceTeacherId(Long guidanceTeacherId);
 }
