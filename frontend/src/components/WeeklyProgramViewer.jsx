@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 
 async function fetchPrograms() {
   const { data } = await api.get('/programs')
@@ -21,6 +22,7 @@ function formatDate(value) {
 
 function ProgramItem({ program, onDelete, deleting }) {
   const [fileUrl, setFileUrl] = useState(null)
+  const [zoomOpen, setZoomOpen] = useState(false)
 
   useEffect(() => {
     let objectUrl
@@ -58,7 +60,26 @@ function ProgramItem({ program, onDelete, deleting }) {
         )}
       </div>
       {fileUrl && isImage && (
-        <img src={fileUrl} alt={program.originalFileName} className="max-w-full self-start rounded-lg border" />
+        <>
+          <button
+            type="button"
+            onClick={() => setZoomOpen(true)}
+            className="self-start"
+            title="Tam boyutta görmek için tıkla"
+          >
+            <img
+              src={fileUrl}
+              alt={program.originalFileName}
+              className="max-w-full cursor-zoom-in rounded-lg border"
+            />
+          </button>
+          <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+            <DialogContent className="max-h-[92vh] max-w-[95vw] overflow-auto sm:max-w-[95vw]">
+              <DialogTitle className="sr-only">{program.originalFileName}</DialogTitle>
+              <img src={fileUrl} alt={program.originalFileName} className="max-h-[85vh] w-auto max-w-full" />
+            </DialogContent>
+          </Dialog>
+        </>
       )}
       {fileUrl && !isImage && (
         <a
